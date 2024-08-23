@@ -15,27 +15,48 @@ class Display(Widget):
         self.padding = padding
         super().__init__(*args, **kwargs)
 
+    def watch_value(self, val):
+        self.query_one(Digits).update(f"{val}".zfill(self.padding))
+
     def compose(self) -> ComposeResult:
         yield Label(self.label)
-        yield Digits(f"{self.value}".zfill(self.padding))
+        yield Digits()
 
 
 class OBDDisplay(App):
     CSS_PATH = "styles.tcss"
 
+    temp = reactive(0)
+    speed = reactive(0)
+    rpm = reactive(0)
+
     def compose(self) -> ComposeResult:
-        yield Display(label="Speed (km/h)", padding=3, id="speed")
-        yield Display(label="RPM (x1000)", padding=2, id="rpm")
-        yield Display(label="Temp (c)", padding=3, id="temp")
+        yield Display(
+            label="Speed (km/h)",
+            padding=3,
+            id="speed",
+        ).data_bind(value=OBDDisplay.speed)
+
+        yield Display(
+            label="RPM (x1000)",
+            padding=2,
+            id="rpm",
+        ).data_bind(value=OBDDisplay.rpm)
+
+        yield Display(
+            label="Temp (c)",
+            padding=3,
+            id="temp",
+        ).data_bind(value=OBDDisplay.temp)
 
     def update_rpm(self, response):
-        self.query_one("#rpm").value = response.value
+        self.rpm = response.value
 
     def update_speed(self, response):
-        self.query_one("#speed").value = response.value
+        self.speed = response.value
 
     def update_temp(self, response):
-        self.query_one("#temp").value = response.value
+        self.temp = response.value
 
     def on_mount(self):
         self.connection = obd.Async()
