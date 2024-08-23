@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "textualobd"
+version = "0.1.0"
+description = "Display car info on terminal"
+authors = ["Syafiq Termizi <73152242+SyafiqTermizi2010@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+textual = "^0.77.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

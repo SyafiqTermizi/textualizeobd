@@ -1,0 +1,18 @@
+Screen {
+    layout: grid;
+    grid-size: 3;
+}
+
+Display {
+    width: auto;
+    height: auto;
+    padding: 1 2;
+    background: $panel;
+    border: wide $background;
+    /* align: center middle; */
+
+    & Digits {
+        width: auto;
+        color: $secondary;
+    }
+}
