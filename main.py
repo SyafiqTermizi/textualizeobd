@@ -70,7 +70,7 @@ class OBDDisplay(App):
         self.coolant_temp = response.value.magnitude
 
     def update_oil_temp(self, response):
-        self.coolant_temp = response.value.magnitude
+        self.oil_temp = response.value.magnitude
 
     def update_throttle_pos(self, response):
         val = response.value.magnitude
