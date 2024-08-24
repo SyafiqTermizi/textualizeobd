@@ -1,6 +1,8 @@
+import os
 from typing import Any
 
 import obd
+from dotenv import load_dotenv
 from textual.app import App, ComposeResult
 from textual.reactive import reactive
 from textual.widget import Widget
@@ -34,19 +36,16 @@ class OBDDisplay(App):
         yield Display(
             label="Speed (km/h)",
             padding=3,
-            id="speed",
         ).data_bind(value=OBDDisplay.speed)
 
         yield Display(
             label="RPM",
             padding=5,
-            id="rpm",
         ).data_bind(value=OBDDisplay.rpm)
 
         yield Display(
             label="Temp (ºc)",
             padding=3,
-            id="temp",
         ).data_bind(value=OBDDisplay.temp)
 
     def update_rpm(self, response):
@@ -59,7 +58,7 @@ class OBDDisplay(App):
         self.temp = response.value.magnitude
 
     def on_mount(self):
-        self.connection = obd.Async()
+        self.connection = obd.Async(portstr=os.environ.get("OBD_PORT"))
 
         self.connection.watch(obd.commands.COOLANT_TEMP, callback=self.update_temp)
         self.connection.watch(obd.commands.RPM, callback=self.update_rpm)
@@ -78,4 +77,5 @@ class OBDDisplay(App):
 
 
 if __name__ == "__main__":
+    load_dotenv()
     OBDDisplay().run()

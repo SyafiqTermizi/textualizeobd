@@ -279,7 +279,7 @@ my_awesome_project/media/
 .ipython/
 my_awesome_project/static/webpack_bundles/
 webpack-stats.json
-.env*
+.env
 .envs/*
 .vscode/
 
