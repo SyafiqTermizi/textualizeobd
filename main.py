@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from textual.app import App, ComposeResult
 from textual.reactive import reactive
 from textual.widget import Widget
-from textual.widgets import Digits, Label
+from textual.widgets import Digits, Header, Label
 
 
 class Display(Widget):
@@ -28,11 +28,14 @@ class Display(Widget):
 class OBDDisplay(App):
     CSS_PATH = "styles.tcss"
 
-    temp = reactive(0.0)
+    oil_temp = reactive(0.0)
+    coolant_temp = reactive(0.0)
     speed = reactive(0)
     rpm = reactive(0)
 
     def compose(self) -> ComposeResult:
+        yield Header(show_clock=True)
+
         yield Display(
             label="Speed (km/h)",
             padding=3,
@@ -44,9 +47,14 @@ class OBDDisplay(App):
         ).data_bind(value=OBDDisplay.rpm)
 
         yield Display(
-            label="Temp (ºc)",
+            label="Coolant temp (ºc)",
             padding=3,
-        ).data_bind(value=OBDDisplay.temp)
+        ).data_bind(value=OBDDisplay.coolant_temp)
+
+        yield Display(
+            label="Oil temp (ºc)",
+            padding=3,
+        ).data_bind(value=OBDDisplay.oil_temp)
 
     def update_rpm(self, response):
         self.rpm = response.value.magnitude
@@ -54,13 +62,23 @@ class OBDDisplay(App):
     def update_speed(self, response):
         self.speed = response.value.magnitude
 
-    def update_temp(self, response):
-        self.temp = response.value.magnitude
+    def update_coolant_temp(self, response):
+        self.coolant_temp = response.value.magnitude
+
+    def update_oil_temp(self, response):
+        self.coolant_temp = response.value.magnitude
 
     def on_mount(self):
         self.connection = obd.Async(portstr=os.environ.get("OBD_PORT"))
 
-        self.connection.watch(obd.commands.COOLANT_TEMP, callback=self.update_temp)
+        self.connection.watch(
+            obd.commands.COOLANT_TEMP,
+            callback=self.update_coolant_temp,
+        )
+        self.connection.watch(
+            obd.commands.OIL_TEMP,
+            callback=self.update_oil_temp,
+        )
         self.connection.watch(obd.commands.RPM, callback=self.update_rpm)
         self.connection.watch(obd.commands.SPEED, callback=self.update_speed)
 
