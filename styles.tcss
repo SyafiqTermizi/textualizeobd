@@ -1,19 +1,28 @@
 Screen {
-    layout: grid;
-    grid-size: 4;
-}
+    #bar {
+        dock: top;
+        padding: 1 2;
+        height: 5%;
+        background: $secondary;
+    }
 
-Display {
-    width: 100%;
-    text-align: center;
-    height: auto;
-    padding: 1 2;
-    background: $panel;
-    border: wide $background;
-    /* align: center middle; */
+    #grid {
+        layout: grid;
+        grid-size: 4;
+    }
 
-    & Digits {
-        width: auto;
-        color: $secondary;
+    Display {
+        width: 100%;
+        text-align: center;
+        height: auto;
+        padding: 1 2;
+        background: $panel;
+        border: wide $background;
+        /* align: center middle; */
+
+        & Digits {
+            width: auto;
+            color: $secondary;
+        }
     }
 }

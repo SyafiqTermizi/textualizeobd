@@ -4,6 +4,7 @@ from typing import Any
 import obd
 from dotenv import load_dotenv
 from textual.app import App, ComposeResult
+from textual.containers import Container
 from textual.reactive import reactive
 from textual.widget import Widget
 from textual.widgets import Digits, Header, Label
@@ -36,25 +37,28 @@ class OBDDisplay(App):
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
 
-        yield Display(
-            label="Speed (km/h)",
-            padding=3,
-        ).data_bind(value=OBDDisplay.speed)
+        with Container(id="grid"):
+            yield Display(
+                label="Speed (km/h)",
+                padding=3,
+            ).data_bind(value=OBDDisplay.speed)
 
-        yield Display(
-            label="RPM",
-            padding=5,
-        ).data_bind(value=OBDDisplay.rpm)
+            yield Display(
+                label="RPM",
+                padding=5,
+            ).data_bind(value=OBDDisplay.rpm)
 
-        yield Display(
-            label="Coolant temp (ºc)",
-            padding=3,
-        ).data_bind(value=OBDDisplay.coolant_temp)
+            yield Display(
+                label="Coolant temp (ºc)",
+                padding=3,
+            ).data_bind(value=OBDDisplay.coolant_temp)
 
-        yield Display(
-            label="Oil temp (ºc)",
-            padding=3,
-        ).data_bind(value=OBDDisplay.oil_temp)
+            yield Display(
+                label="Oil temp (ºc)",
+                padding=3,
+            ).data_bind(value=OBDDisplay.oil_temp)
+
+        yield Container(id="bar")
 
     def update_rpm(self, response):
         self.rpm = response.value.magnitude
@@ -67,6 +71,10 @@ class OBDDisplay(App):
 
     def update_oil_temp(self, response):
         self.coolant_temp = response.value.magnitude
+
+    def update_throttle_pos(self, response):
+        val = response.value.magnitude
+        self.query_one("#bar").styles.width = f"{val}%"
 
     def on_mount(self):
         self.connection = obd.Async(portstr=os.environ.get("OBD_PORT"))
@@ -81,6 +89,11 @@ class OBDDisplay(App):
         )
         self.connection.watch(obd.commands.RPM, callback=self.update_rpm)
         self.connection.watch(obd.commands.SPEED, callback=self.update_speed)
+        self.connection.watch(
+            obd.commands.THROTTLE_POS, callback=self.update_throttle_pos
+        )
+
+        self.query_one("#bar").styles.width = "0%"
 
         self.connection.start()
 
