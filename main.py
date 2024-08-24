@@ -26,7 +26,7 @@ class Display(Widget):
 class OBDDisplay(App):
     CSS_PATH = "styles.tcss"
 
-    temp = reactive(0)
+    temp = reactive(0.0)
     speed = reactive(0)
     rpm = reactive(0)
 
@@ -38,25 +38,25 @@ class OBDDisplay(App):
         ).data_bind(value=OBDDisplay.speed)
 
         yield Display(
-            label="RPM (x1000)",
-            padding=2,
+            label="RPM",
+            padding=5,
             id="rpm",
         ).data_bind(value=OBDDisplay.rpm)
 
         yield Display(
-            label="Temp (c)",
+            label="Temp (ºc)",
             padding=3,
             id="temp",
         ).data_bind(value=OBDDisplay.temp)
 
     def update_rpm(self, response):
-        self.rpm = response.value
+        self.rpm = response.value.magnitude
 
     def update_speed(self, response):
-        self.speed = response.value
+        self.speed = response.value.magnitude
 
     def update_temp(self, response):
-        self.temp = response.value
+        self.temp = response.value.magnitude
 
     def on_mount(self):
         self.connection = obd.Async()
